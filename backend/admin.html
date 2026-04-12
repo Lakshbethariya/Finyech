@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NextGen Credit Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1b2a;--navy-mid:#1a2d45;--navy-light:#243b55;
+  --blue:#1565c0;--blue-l:#1976d2;--blue-a:#42a5f5;
+  --white:#fff;--g50:#f8fafc;--g100:#f0f4f8;--g200:#e2e8f0;
+  --g400:#94a3b8;--g600:#475569;--g800:#1e293b;
+  --green:#00897b;--gl:#e0f2f1;--amber:#f59e0b;--al:#fffbeb;
+  --red:#dc2626;--rl:#fef2f2;
+  --fm:'DM Sans',sans-serif;--fd:'Playfair Display',serif;--fmo:'DM Mono',monospace;
+  --rad:12px;--rads:8px;--sh:0 4px 24px rgba(13,27,42,.12);--shl:0 12px 40px rgba(13,27,42,.18);
+  --tr:all .2s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--fm);background:var(--navy);color:var(--white)}
+a{text-decoration:none;cursor:pointer}
+button{cursor:pointer;font-family:var(--fm);border:none;outline:none}
+input,select,textarea{font-family:var(--fm);outline:none}
+
+/* PAGE SYSTEM */
+.page{display:none;position:fixed;inset:0;overflow:hidden;animation:fadeIn .3s ease}
+.page.active{display:flex;flex-direction:column}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* NAVBAR */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;height:64px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 32px;
+  background:rgba(13,27,42,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08)
+}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-logo{width:36px;height:36px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;letter-spacing:.5px}
+.nav-logo.sm{width:28px;height:28px;font-size:11px}
+.nav-title{font-weight:600;font-size:17px;letter-spacing:-.3px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{color:var(--g400);font-size:14px;padding:6px 14px;border-radius:6px;transition:var(--tr)}
+.nav-link:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.nav-btn{background:var(--blue);color:var(--white);padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;transition:var(--tr);margin-left:8px}
+.nav-btn:hover{background:var(--blue-l)}
+.acc{color:var(--blue-a)}
+
+/* LANDING */
+#page-landing{padding-top:64px;background:var(--navy);flex-direction:column;justify-content:space-between}
+.hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(21,101,192,.15) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 60%,rgba(66,165,245,.08) 0%,transparent 50%)}
+.grid-over{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:60px 60px}
+.hero-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 40px 20px;flex:1;justify-content:center}
+.hero-badge{display:inline-block;background:rgba(66,165,245,.15);border:1px solid rgba(66,165,245,.3);color:var(--blue-a);font-size:12px;font-weight:500;letter-spacing:.8px;padding:6px 18px;border-radius:100px;margin-bottom:24px;animation:fadeIn .5s ease .1s both}
+.hero-title{font-family:var(--fd);font-size:clamp(38px,5vw,60px);font-weight:800;line-height:1.1;margin-bottom:20px;animation:fadeIn .5s ease .2s both}
+.hero-sub{max-width:560px;font-size:16px;line-height:1.7;color:var(--g400);margin-bottom:32px;animation:fadeIn .5s ease .3s both}
+.hero-acts{display:flex;gap:14px;margin-bottom:40px;animation:fadeIn .5s ease .4s both}
+.hero-stats{display:flex;align-items:center;gap:32px;animation:fadeIn .5s ease .5s both}
+.stat-i{display:flex;flex-direction:column;align-items:center}
+.stat-n{font-size:24px;font-weight:700}
+.stat-l{font-size:11px;color:var(--g400);letter-spacing:.5px;margin-top:2px}
+.stat-d{width:1px;height:36px;background:rgba(255,255,255,.1)}
+.feat-bar{position:relative;z-index:1;display:flex;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.08)}
+.feat-c{flex:1;display:flex;align-items:center;gap:16px;padding:20px 28px;border-right:1px solid rgba(255,255,255,.06);transition:var(--tr)}
+.feat-c:last-child{border-right:none}
+.feat-c:hover{background:rgba(255,255,255,.04)}
+.feat-ic{font-size:24px;flex-shrink:0}
+.feat-t{display:flex;flex-direction:column;gap:3px}
+.feat-t strong{font-size:13px;font-weight:600}
+.feat-t span{font-size:12px;color:var(--g400);line-height:1.4}
+
+/* BUTTONS */
+.btn-p{background:var(--blue);color:var(--white);padding:12px 28px;border-radius:var(--rads);font-size:14px;font-weight:600;transition:var(--tr);display:inline-flex;align-items:center;gap:8px}
+.btn-p:hover{background:var(--blue-l);transform:translateY(-1px);box-shadow:0 4px 16px rgba(21,101,192,.4)}
+.btn-p.full{width:100%;justify-content:center}
+.btn-p.lg{padding:15px 28px;font-size:15px}
+.btn-g{background:rgba(255,255,255,.08);color:var(--white);padding:12px 24px;border-radius:var(--rads);font-size:14px;font-weight:500;border:1px solid rgba(255,255,255,.12);transition:var(--tr)}
+.btn-g:hover{background:rgba(255,255,255,.14)}
+.btn-g.full{width:100%;justify-content:center;margin-top:8px}
+.back-btn{background:none;color:var(--g400);font-size:13px;padding:6px 0;transition:var(--tr);display:flex;align-items:center;gap:4px}
+.back-btn:hover{color:var(--white)}
+
+/* AUTH */
+#page-login{padding-top:64px;background:var(--navy);align-items:center;justify-content:center}
+.auth-con{display:flex;width:900px;max-width:95vw;background:var(--navy-mid);border-radius:20px;border:1px solid rgba(255,255,255,.08);overflow:hidden;box-shadow:var(--shl)}
+.auth-l{width:320px;flex-shrink:0;background:var(--navy-light);padding:48px 36px;display:flex;flex-direction:column;justify-content:space-between;background-image:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(21,101,192,.25) 0%,transparent 60%)}
+.auth-logo{width:48px;height:48px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin-bottom:16px}
+.auth-l h2{font-family:var(--fd);font-size:26px;line-height:1.3}
+.auth-l blockquote{font-size:14px;color:var(--g400);line-height:1.6;font-style:italic;margin-bottom:12px}
+.auth-l p{font-size:12px;color:var(--g600)}
+.auth-r{flex:1;padding:48px 40px}
+.auth-tabs{display:flex;gap:0;margin-bottom:28px;background:rgba(255,255,255,.05);border-radius:8px;padding:4px}
+.auth-tab{flex:1;background:none;color:var(--g400);padding:9px;border-radius:6px;font-size:14px;font-weight:500;transition:var(--tr)}
+.auth-tab.active{background:var(--blue);color:var(--white)}
+.fh{font-size:22px;font-weight:700;margin-bottom:4px}
+.fs{font-size:13px;color:var(--g400);margin-bottom:24px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fg label{font-size:12px;font-weight:500;color:var(--g400);letter-spacing:.3px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fi{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--white);border-radius:var(--rads);padding:11px 14px;font-size:14px;transition:var(--tr);width:100%}
+.fi:focus{border-color:var(--blue-a);background:rgba(255,255,255,.09)}
+.fi option{background:var(--navy-mid)}
+.fm-msg{font-size:13px;margin-bottom:12px;min-height:18px}
+.fm-msg.err{color:#f87171}.fm-msg.suc{color:#34d399}
+.ff{font-size:12px;color:var(--g600);text-align:center;margin-top:14px}
+.ff code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;font-family:var(--fmo)}
+.fsec{font-size:11px;font-weight:600;color:var(--blue-a);letter-spacing:1px;text-transform:uppercase;margin:12px 0 14px}
+
+/* DASHBOARD */
+#page-dashboard,#page-admin{padding-top:64px;background:var(--g800)}
+.dl{display:flex;height:100%;overflow:hidden}
+.sidebar{width:220px;flex-shrink:0;background:var(--navy);border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;padding:24px 0}
+.sb-user{display:flex;align-items:center;gap:12px;padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:16px}
+.ua{width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.ua.adm{background:#7c3aed}
+.un{font-size:13px;font-weight:600}
+.ur{font-size:11px;color:var(--g400);margin-top:2px}
+.sb-nav{display:flex;flex-direction:column;gap:2px;padding:0 10px}
+.sl{display:block;padding:10px 12px;border-radius:var(--rads);font-size:13px;color:var(--g400);font-weight:500;transition:var(--tr);cursor:pointer}
+.sl:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.sl.active{color:var(--white);background:rgba(21,101,192,.25)}
+.dm{flex:1;overflow-y:auto;padding:28px 32px;background:#0f1923}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+.dt{font-size:22px;font-weight:700}
+.dsb{font-size:13px;color:var(--g400);margin-top:4px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px}
+.kpi-c{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:var(--rad);padding:20px}
+.kpi-lb{font-size:11px;color:var(--g400);font-weight:500;letter-spacing:.3px;margin-bottom:8px}
+.kpi-v{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.kpi-su{font-size:11px;color:var(--g600)}
+.apc{color:#34d399}.rjc{color:#f87171}.ryc{color:var(--amber)}
+.dc{display:grid;grid-template-columns:240px 1fr;gap:20px}
+.dcard{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:var(--rad);padding:20px}
+.dcard h4{font-size:13px;font-weight:600;color:var(--g400);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px}
+.gauge-w{display:flex;flex-direction:column;align-items:center}
+.gauge-lbl{font-size:12px;color:var(--g400);margin-top:6px}
+.rl{display:flex;flex-direction:column;gap:10px}
+.ri{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(255,255,255,.04);border-radius:var(--rads);font-size:13px;cursor:pointer}
+.ri:hover{background:rgba(255,255,255,.07)}
+.rs{font-weight:700;font-size:16px}
+.empty{font-size:13px;color:var(--g600);text-align:center;padding:24px 0}
+.empty a{color:var(--blue-a)}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.hcard{background:var(--navy-mid);border:1px solid rgba(255,255,255,.07);border-radius:var(--rad);padding:20px;transition:var(--tr);cursor:pointer}
+.hcard:hover{border-color:rgba(66,165,245,.3)}
+.hct{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.hcs{font-size:32px;font-weight:800}
+.hcd{font-size:11px;color:var(--g400)}
+.hcr{display:flex;justify-content:space-between;margin-top:8px}
+.hcl{font-size:11px;color:var(--g600)}
+.hcv{font-size:12px;font-weight:600}
+
+/* BADGES */
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;letter-spacing:.3px}
+.bl{background:var(--gl);color:var(--green)}.bm{background:var(--al);color:#92400e}.bh{background:var(--rl);color:var(--red)}
+.bap{background:var(--gl);color:var(--green)}.bry{background:var(--al);color:#92400e}.brj{background:var(--rl);color:var(--red)}
+
+/* ANALYSIS */
+#page-analysis{padding-top:64px;background:#0f1923}
+.al{display:flex;height:100%}
+.afp{width:540px;flex-shrink:0;background:var(--navy-mid);border-right:1px solid rgba(255,255,255,.07);overflow-y:auto;padding:28px 36px;display:flex;flex-direction:column}
+.ph{margin-bottom:24px}
+.ph h2{font-size:22px;font-weight:700;margin:10px 0 6px}
+.ph p{font-size:13px;color:var(--g400);line-height:1.5}
+.arp{flex:1;overflow-y:auto;padding:28px 36px;background:#0f1923}
+.arp h2{font-size:20px;font-weight:700;margin-top:8px}
+.rsc{display:flex;align-items:center;gap:24px;background:var(--navy-mid);border:1px solid rgba(255,255,255,.08);border-radius:var(--rad);padding:24px 28px;margin-bottom:20px}
+.sb{font-family:var(--fd);font-size:52px;font-weight:800;line-height:1}
+.sl2{font-size:12px;color:var(--g400);margin:4px 0 8px}
+.rbadge{display:inline-block;font-size:12px;font-weight:600;padding:4px 14px;border-radius:100px;letter-spacing:.3px}
+.db{text-align:center;min-width:120px;background:rgba(255,255,255,.04);border-radius:var(--rad);padding:16px 20px}
+.di{font-size:28px;margin-bottom:6px}
+.dtx{font-size:14px;font-weight:700}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.fitem{display:flex;justify-content:space-between;align-items:center;background:var(--navy-mid);border:1px solid rgba(255,255,255,.06);border-radius:var(--rads);padding:12px 14px;font-size:13px}
+.fl{color:var(--g400)}
+.fim{font-weight:700;font-size:13px}
+.fim.positive{color:#34d399}.fim.negative{color:#f87171}.fim.neutral{color:var(--amber)}
+.ai-box{background:rgba(21,101,192,.1);border:1px solid rgba(21,101,192,.25);border-radius:var(--rad);padding:18px;margin-bottom:20px}
+.ai-lbl{font-size:10px;font-weight:600;color:var(--blue-a);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.ai-t{font-size:12px;color:var(--g400);line-height:1.7;white-space:pre-line;max-height:160px;overflow-y:auto}
+
+/* REPORT */
+#page-report{padding-top:64px;background:#0f1923}
+.rpl{display:flex;height:100%}
+.rps{width:240px;flex-shrink:0;background:var(--navy);border-right:1px solid rgba(255,255,255,.07);padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+.rps h3{font-size:16px;font-weight:700}
+.rmeta{display:flex;flex-direction:column;gap:14px;flex:1}
+.rmi{display:flex;flex-direction:column;gap:3px}
+.rmi span{font-size:11px;color:var(--g400)}
+.rmi strong{font-size:13px;font-weight:600}
+.rpm{flex:1;overflow-y:auto;padding:24px 32px;background:var(--g50);color:var(--navy)}
+.rphb{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid var(--navy)}
+.rla{display:flex;align-items:center;gap:14px}
+.rbn{font-size:16px;font-weight:700;color:var(--navy)}
+.rbs{font-size:11px;color:var(--g600)}
+.rsd-s{font-family:var(--fd);font-size:52px;font-weight:800;color:var(--navy);line-height:1}
+.rsd-l{font-size:12px;color:var(--g600);text-align:right}
+.rsec{margin-bottom:24px}
+.rsec h4{font-size:12px;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--g200)}
+.rrow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rkpi{display:flex;flex-direction:column;gap:4px;background:var(--g100);padding:14px;border-radius:var(--rads)}
+.rkpi span{font-size:11px;color:var(--g600)}
+.rkpi strong{font-size:14px;font-weight:700;color:var(--navy)}
+.rai{font-size:12px;line-height:1.8;color:var(--g800);background:var(--g100);padding:14px;border-radius:var(--rads);white-space:pre-line;max-height:180px;overflow-y:auto}
+.ftbl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fr2{display:flex;justify-content:space-between;align-items:center;background:var(--g100);padding:10px 14px;border-radius:var(--rads);font-size:12px}
+.fr2 .imp{font-weight:700}
+.fr2 .imp.pos{color:var(--green)}.fr2 .imp.neg{color:var(--red)}
+.rdiscl{font-size:11px;color:var(--g600);line-height:1.6;padding:14px;background:var(--g100);border-radius:var(--rads);border-left:3px solid var(--g400)}
+
+/* ADMIN */
+.admin-badge{background:rgba(124,58,237,.2);color:#a78bfa;font-size:12px;font-weight:600;padding:4px 14px;border-radius:100px}
+.cnt-badge{background:rgba(255,255,255,.08);color:var(--g400);font-size:12px;padding:6px 14px;border-radius:100px}
+.dtw{overflow:auto;background:var(--navy-mid);border-radius:var(--rad);border:1px solid rgba(255,255,255,.07)}
+.dtbl{width:100%;border-collapse:collapse;font-size:13px}
+.dtbl th{padding:12px 16px;text-align:left;font-size:11px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap}
+.dtbl td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--g200)}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:rgba(255,255,255,.03)}
+.te{text-align:center;color:var(--g600);padding:24px !important}
+.btnr{background:var(--blue);color:white;padding:5px 14px;border-radius:6px;font-size:12px;font-weight:500;transition:var(--tr)}
+.btnr:hover{background:var(--blue-l)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(4px)}
+.modal{background:var(--navy-mid);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;width:440px;max-width:90vw}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.modal p{font-size:13px;color:var(--g400);margin-bottom:20px}
+.ma{display:flex;gap:10px;margin-top:20px}
+.bta{background:#059669;color:white;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;transition:var(--tr)}
+.bta:hover{background:#047857}
+.btre{background:var(--red);color:white;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;transition:var(--tr)}
+.btre:hover{background:#b91c1c}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:999;background:var(--navy-mid);color:var(--white);border:1px solid rgba(255,255,255,.1);padding:12px 20px;border-radius:var(--rads);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:var(--shl)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-left:3px solid #34d399}
+.toast.error{border-left:3px solid #f87171}
+.toast.info{border-left:3px solid var(--blue-a)}
+
+/* LOADING */
+.lov{position:fixed;inset:0;background:rgba(13,27,42,.9);display:flex;align-items:center;justify-content:center;z-index:998;backdrop-filter:blur(6px)}
+.lbox{text-align:center}
+.lspinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--blue-a);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-size:16px;font-weight:600;margin-bottom:6px}
+.lsub{font-size:12px;color:var(--g400)}
+.btnldr{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+
+@media print{
+  .navbar,.rps,.toast,.lov,.modal-ov{display:none!important}
+  #page-report{display:flex!important;position:relative!important}
+  .rpm{color:#000;background:#fff}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo">NG</div>
+    <span class="nav-title">NextGen <span class="acc">Credit</span></span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a class="nav-link" onclick="showPage('landing')">Home</a>
+    <a class="nav-link" id="navDash" style="display:none" onclick="showPage('dashboard')">Dashboard</a>
+    <a class="nav-link" id="navAnal" style="display:none" onclick="showPage('analysis')">Analysis</a>
+    <a class="nav-link" id="navAdm" style="display:none" onclick="showPage('admin')">Admin</a>
+    <a class="nav-link" id="navOut" style="display:none" onclick="logout()">Logout</a>
+    <a class="nav-btn" id="navIn" onclick="showPage('login')">Sign In</a>
+  </div>
+</nav>
+
+<!-- LANDING -->
+<div class="page active" id="page-landing">
+  <div class="hero-bg"><div class="grid-over"></div></div>
+  <div class="hero-content">
+    <div class="hero-badge">AI-Powered Corporate Credit Analysis</div>
+    <h1 class="hero-title">Intelligent Credit<br/><span class="acc">Decisions.</span> Instantly.</h1>
+    <p class="hero-sub">NextGen Credit Intelligence leverages advanced risk modeling to help financial institutions make faster, smarter lending decisions with institutional-grade accuracy.</p>
+    <div class="hero-acts">
+      <button class="btn-p" onclick="showPage('login')">Analyze Credit Now</button>
+      <button class="btn-g" onclick="showPage('login')">Sign In →</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-i"><span class="stat-n">99.2%</span><span class="stat-l">Accuracy Rate</span></div>
+      <div class="stat-d"></div>
+      <div class="stat-i"><span class="stat-n">&lt;30s</span><span class="stat-l">Analysis Time</span></div>
+      <div class="stat-d"></div>
+      <div class="stat-i"><span class="stat-n">12+</span><span class="stat-l">Risk Parameters</span></div>
+    </div>
+  </div>
+  <div class="feat-bar">
+    <div class="feat-c"><div class="feat-ic">⚡</div><div class="feat-t"><strong>Real-Time Scoring</strong><span>Instant credit score generation with AI-driven risk assessment</span></div></div>
+    <div class="feat-c"><div class="feat-ic">🛡️</div><div class="feat-t"><strong>GST Compliance Check</strong><span>Automated verification of GST registration and compliance status</span></div></div>
+    <div class="feat-c"><div class="feat-ic">📊</div><div class="feat-t"><strong>Full Risk Reports</strong><span>Downloadable reports with detailed factor breakdown</span></div></div>
+    <div class="feat-c"><div class="feat-ic">🔐</div><div class="feat-t"><strong>Role-Based Access</strong><span>Separate user and admin dashboards with JWT-secured APIs</span></div></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+  <div class="auth-con">
+    <div class="auth-l">
+      <div>
+        <div class="auth-logo">NG</div>
+        <h2>NextGen Credit<br/><span class="acc">Intelligence</span></h2>
+      </div>
+      <div>
+        <blockquote>"Credit intelligence is the difference between growth and risk."</blockquote>
+        <p>Trusted by financial institutions for corporate credit decisions.</p>
+      </div>
+    </div>
+    <div class="auth-r">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabL" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tabS" onclick="switchTab('signup')">Register</button>
+      </div>
+      <div id="fLogin">
+        <div class="fh">Welcome back</div>
+        <div class="fs">Sign in to your account</div>
+        <div class="fg"><label>Email Address</label><input type="email" id="lEmail" placeholder="you@company.com" class="fi"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" class="fi"/></div>
+        <div id="lMsg" class="fm-msg"></div>
+        <button class="btn-p full" onclick="doLogin()">Sign In</button>
+        <p class="ff">Demo Admin: <code>admin@nextgen.com</code> / <code>admin123</code><br/>Demo User: <code>user@company.com</code> / <code>user123</code></p>
+      </div>
+      <div id="fSignup" style="display:none">
+        <div class="fh">Create Account</div>
+        <div class="fs">Start your credit analysis journey</div>
+        <div class="fr">
+          <div class="fg"><label>Full Name</label><input type="text" id="sName" placeholder="John Doe" class="fi"/></div>
+          <div class="fg"><label>Company</label><input type="text" id="sComp" placeholder="Acme Corp Ltd" class="fi"/></div>
+        </div>
+        <div class="fg"><label>Email Address</label><input type="email" id="sEmail" placeholder="you@company.com" class="fi"/></div>
+        <div class="fg"><label>Password</label><input type="password" id="sPass" placeholder="Min. 6 characters" class="fi"/></div>
+        <div id="sMsg" class="fm-msg"></div>
+        <button class="btn-p full" onclick="doSignup()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="dl">
+    <aside class="sidebar">
+      <div class="sb-user">
+        <div class="ua" id="sbAv">JD</div>
+        <div><div class="un" id="sbName">John Doe</div><div class="ur" id="sbRole">User</div></div>
+      </div>
+      <nav class="sb-nav">
+        <a class="sl active" onclick="showDashTab('ov')">📊 Overview</a>
+        <a class="sl" onclick="showPage('analysis')">🧮 New Analysis</a>
+        <a class="sl" onclick="showDashTab('hist')">📁 My Reports</a>
+        <a class="sl" onclick="logout()">🚪 Sign Out</a>
+      </nav>
+    </aside>
+    <main class="dm">
+      <div id="dashOv">
+        <div class="dh">
+          <div><h2 class="dt">Dashboard</h2><p class="dsb" id="dashWel">Welcome back!</p></div>
+          <button class="btn-p" onclick="showPage('analysis')">+ New Analysis</button>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-c"><div class="kpi-lb">Latest Score</div><div class="kpi-v" id="kScore">—</div><div class="kpi-su">out of 100</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Risk Level</div><div class="kpi-v" id="kRisk">—</div><div class="kpi-su">classification</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Decision</div><div class="kpi-v" id="kDec">—</div><div class="kpi-su">latest report</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Total Analyses</div><div class="kpi-v" id="kTot">0</div><div class="kpi-su">submitted</div></div>
+        </div>
+        <div class="dc">
+          <div class="dcard"><h4>Score Gauge</h4><div class="gauge-w"><canvas id="dashGauge" width="200" height="120"></canvas><div class="gauge-lbl" id="gLbl">No Data</div></div></div>
+          <div class="dcard"><h4>Recent Reports</h4><div id="recRpts" class="rl"><div class="empty">No analyses yet. <a onclick="showPage('analysis')">Run your first →</a></div></div></div>
+        </div>
+      </div>
+      <div id="dashHist" style="display:none">
+        <div class="dh"><h2 class="dt">My Reports</h2><button class="btn-p" onclick="showPage('analysis')">+ New Analysis</button></div>
+        <div id="histList" class="hgrid"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ANALYSIS -->
+<div class="page" id="page-analysis">
+  <div class="al">
+    <div class="afp" id="aForm">
+      <div class="ph">
+        <button class="back-btn" onclick="showPage('dashboard')">← Back</button>
+        <h2>Credit Analysis</h2>
+        <p>Enter your company's financial data for an instant credit assessment</p>
+      </div>
+      <div class="fsec">Financial Information</div>
+      <div class="fr">
+        <div class="fg"><label>Annual Revenue (₹)</label><input type="number" id="rev" placeholder="e.g. 5000000" class="fi" min="0"/></div>
+        <div class="fg"><label>Annual Expenses (₹)</label><input type="number" id="exp" placeholder="e.g. 3500000" class="fi" min="0"/></div>
+      </div>
+      <div class="fsec">Business Profile</div>
+      <div class="fr">
+        <div class="fg"><label>GST Registration Status</label>
+          <select id="gst" class="fi">
+            <option value="">Select status</option>
+            <option value="active">Active & Compliant</option>
+            <option value="pending">Pending Registration</option>
+            <option value="inactive">Not Registered</option>
+          </select>
+        </div>
+        <div class="fg"><label>Loan History</label>
+          <select id="loan" class="fi">
+            <option value="">Select history</option>
+            <option value="no_default">No Defaults (Clean Record)</option>
+            <option value="minor_default">Minor Default (Resolved)</option>
+            <option value="major_default">Major Default</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Years in Business</label><input type="number" id="yrs" placeholder="e.g. 3" class="fi" min="0" max="100"/></div>
+        <div class="fg"><label>Industry Sector</label>
+          <select id="ind" class="fi">
+            <option value="">Select sector</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="retail">Retail & Trade</option>
+            <option value="it">Information Technology</option>
+            <option value="finance">Financial Services</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="construction">Construction & Real Estate</option>
+            <option value="agriculture">Agriculture</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div id="aMsg" class="fm-msg"></div>
+      <button class="btn-p full lg" id="aBtn" onclick="runAnalysis()">
+        <span id="aBtnTxt">Run Credit Analysis</span>
+        <div class="btnldr" id="aBtnLdr" style="display:none"></div>
+      </button>
+    </div>
+    <div class="arp" id="aResult" style="display:none">
+      <button class="back-btn" onclick="resetAnalysis()">← New Analysis</button>
+      <h2>Analysis Result</h2>
+      <div class="rsc" style="margin-top:14px">
+        <canvas id="resGauge" width="160" height="100"></canvas>
+        <div>
+          <div class="sb" id="rScore">72</div>
+          <div class="sl2">Credit Score</div>
+          <div class="rbadge" id="rRisk">Low Risk</div>
+        </div>
+        <div class="db" id="rDec">
+          <div class="di" id="rDecI">✓</div>
+          <div class="dtx" id="rDecT">Approved</div>
+        </div>
+      </div>
+      <div class="fgrid" id="fGrid"></div>
+      <div class="ai-box"><div class="ai-lbl">AI Summary</div><div class="ai-t" id="aiTxt"></div></div>
+      <button class="btn-p full" onclick="showPage('report')">View Full Report →</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT -->
+<div class="page" id="page-report">
+  <div class="rpl">
+    <div class="rps">
+      <button class="back-btn" onclick="showPage('dashboard')">← Dashboard</button>
+      <h3>Credit Report</h3>
+      <div class="rmeta">
+        <div class="rmi"><span>Report ID</span><strong id="rId">—</strong></div>
+        <div class="rmi"><span>Date</span><strong id="rDate">—</strong></div>
+        <div class="rmi"><span>Company</span><strong id="rComp">—</strong></div>
+        <div class="rmi"><span>Admin Status</span><strong id="rAdmSt">Pending Review</strong></div>
+      </div>
+      <button class="btn-g full" onclick="window.print()">⬇ Download / Print</button>
+    </div>
+    <div class="rpm" id="rContent">
+      <div class="rphb">
+        <div class="rla">
+          <div class="nav-logo sm">NG</div>
+          <div><div class="rbn">NextGen Credit Intelligence</div><div class="rbs">Corporate Credit Analysis System</div></div>
+        </div>
+        <div><div class="rsd-s" id="rsdS">—</div><div class="rsd-l">Credit Score</div></div>
+      </div>
+      <div class="rsec"><h4>Risk Assessment</h4>
+        <div class="rrow">
+          <div class="rkpi"><span>Risk Level</span><strong id="rrRisk">—</strong></div>
+          <div class="rkpi"><span>System Decision</span><strong id="rrDec">—</strong></div>
+          <div class="rkpi"><span>Profit Margin</span><strong id="rrMar">—</strong></div>
+        </div>
+      </div>
+      <div class="rsec"><h4>Financial Overview</h4>
+        <div class="rrow">
+          <div class="rkpi"><span>Annual Revenue</span><strong id="rrRev">—</strong></div>
+          <div class="rkpi"><span>Annual Expenses</span><strong id="rrExp">—</strong></div>
+          <div class="rkpi"><span>GST Status</span><strong id="rrGst">—</strong></div>
+        </div>
+      </div>
+      <div class="rsec"><h4>AI Analysis Summary</h4><div class="rai" id="rrAi">—</div></div>
+      <div class="rsec"><h4>Score Factors</h4><div id="rrFact" class="ftbl"></div></div>
+      <div class="rdiscl"><strong>Disclaimer:</strong> This report is generated by the NextGen Credit Intelligence automated system. All credit decisions must be validated by a qualified credit officer before final approval.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="dl">
+    <aside class="sidebar">
+      <div class="sb-user">
+        <div class="ua adm">AD</div>
+        <div><div class="un">Admin Panel</div><div class="ur">Administrator</div></div>
+      </div>
+      <nav class="sb-nav">
+        <a class="sl active" id="aTO" onclick="showAdmTab('ov')">📊 Overview</a>
+        <a class="sl" id="aTU" onclick="showAdmTab('users')">👥 Users</a>
+        <a class="sl" id="aTR" onclick="showAdmTab('rpts')">📁 All Reports</a>
+        <a class="sl" onclick="logout()">🚪 Sign Out</a>
+      </nav>
+    </aside>
+    <main class="dm">
+      <div id="admOv">
+        <div class="dh"><h2 class="dt">Admin Overview</h2><div class="admin-badge">Administrator</div></div>
+        <div class="kpi-row">
+          <div class="kpi-c"><div class="kpi-lb">Total Users</div><div class="kpi-v" id="akU">—</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Total Reports</div><div class="kpi-v" id="akR">—</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Approved</div><div class="kpi-v apc" id="akA">—</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Rejected</div><div class="kpi-v rjc" id="akRj">—</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Avg Score</div><div class="kpi-v" id="akAv">—</div></div>
+          <div class="kpi-c"><div class="kpi-lb">Pending</div><div class="kpi-v ryc" id="akP">—</div></div>
+        </div>
+        <div class="dc">
+          <div class="dcard" style="grid-column:span 2"><h4>Pending Reviews</h4><div id="admRec" class="rl">Loading...</div></div>
+        </div>
+      </div>
+      <div id="admUsers" style="display:none">
+        <div class="dh"><h2 class="dt">All Users</h2><span class="cnt-badge" id="uCnt">0 users</span></div>
+        <div class="dtw"><table class="dtbl"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Company</th><th>Reports</th><th>Joined</th></tr></thead><tbody id="uTbody"><tr><td colspan="6" class="te">Loading...</td></tr></tbody></table></div>
+      </div>
+      <div id="admRpts" style="display:none">
+        <div class="dh"><h2 class="dt">All Reports</h2><span class="cnt-badge" id="rCnt">0 reports</span></div>
+        <div class="dtw"><table class="dtbl"><thead><tr><th>#</th><th>Company</th><th>Score</th><th>Risk</th><th>Decision</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="rTbody"><tr><td colspan="8" class="te">Loading...</td></tr></tbody></table></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOADING -->
+<div class="lov" id="lov" style="display:none">
+  <div class="lbox">
+    <div class="lspinner"></div>
+    <div class="ltxt" id="ltxt">Analyzing financial data...</div>
+    <div class="lsub">Running AI risk models</div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-ov" id="admModal" style="display:none">
+  <div class="modal">
+    <h3>Review Report</h3>
+    <p>Report ID: <strong id="mRId">—</strong></p>
+    <div class="fg"><label>Admin Notes</label><textarea id="aNotes" class="fi" rows="3" placeholder="Add review notes..."></textarea></div>
+    <div class="ma">
+      <button class="bta" onclick="submitDec('approved')">✓ Approve</button>
+      <button class="btre" onclick="submitDec('rejected')">✗ Reject</button>
+      <button class="btn-g" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================
+   MOCK DATA STORE
+   ================================================ */
+const USERS = [
+  {id:1,name:'Admin User',email:'admin@nextgen.com',password:'admin123',role:'admin',company:'NextGen Credit Intelligence',created_at:'2024-01-15'},
+  {id:2,name:'Demo User',email:'user@company.com',password:'user123',role:'user',company:'Acme Corp Ltd',created_at:'2024-02-10'},
+  {id:3,name:'Rajesh Kumar',email:'rajesh@infosys.com',password:'pass123',role:'user',company:'Infosys Ltd',created_at:'2024-03-05'},
+  {id:4,name:'Priya Sharma',email:'priya@tcs.com',password:'pass123',role:'user',company:'TCS Limited',created_at:'2024-03-20'},
+];
+
+let REPORTS = [
+  {id:1,user_id:2,score:78,risk_level:'Low',decision:'Approved',admin_decision:'approved',revenue:8500000,expenses:5200000,gst_status:'active',loan_history:'no_default',years_in_business:5,industry:'it',created_at:'2024-04-01',ai_summary:'Strong financial profile with healthy margins and full GST compliance.',factors:[{label:'Strong Profit Margin',impact:'+20',type:'positive'},{label:'High Revenue Volume',impact:'+10',type:'positive'},{label:'GST Compliant',impact:'+10',type:'positive'},{label:'Clean Credit History',impact:'+15',type:'positive'},{label:'Established Business',impact:'+8',type:'positive'}]},
+  {id:2,user_id:3,score:55,risk_level:'Medium',decision:'Risky',admin_decision:'pending',revenue:3200000,expenses:2800000,gst_status:'active',loan_history:'minor_default',years_in_business:3,industry:'retail',created_at:'2024-04-05',ai_summary:'Moderate profile with minor default history. Conditional approval recommended.',factors:[{label:'Moderate Profit Margin',impact:'+5',type:'positive'},{label:'GST Compliant',impact:'+10',type:'positive'},{label:'Minor Past Default',impact:'-10',type:'negative'},{label:'Growing Business',impact:'+4',type:'positive'}]},
+  {id:3,user_id:4,score:32,risk_level:'High',decision:'Rejected',admin_decision:'rejected',revenue:1200000,expenses:1400000,gst_status:'inactive',loan_history:'major_default',years_in_business:1,industry:'construction',created_at:'2024-04-08',ai_summary:'High risk profile. Operating at loss with major default history and no GST registration.',factors:[{label:'Operating at Loss',impact:'-20',type:'negative'},{label:'GST Non-Compliant',impact:'-8',type:'negative'},{label:'Major Default History',impact:'-25',type:'negative'},{label:'New Business',impact:'-3',type:'neutral'}]},
+];
+
+let nextReportId = 4;
+let currentUser = null;
+let currentReport = null;
+let pendingId = null;
+
+/* ================================================
+   PAGE NAV
+   ================================================ */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='dashboard') loadDash();
+  if(name==='admin') loadAdmin();
+  if(name==='report' && currentReport) renderReport(currentReport);
+  if(name==='analysis') resetAnalysis();
+}
+
+function switchTab(t){
+  document.getElementById('tabL').classList.toggle('active',t==='login');
+  document.getElementById('tabS').classList.toggle('active',t==='signup');
+  document.getElementById('fLogin').style.display=t==='login'?'block':'none';
+  document.getElementById('fSignup').style.display=t==='signup'?'block':'none';
+}
+
+function showDashTab(t){
+  document.getElementById('dashOv').style.display=t==='ov'?'block':'none';
+  document.getElementById('dashHist').style.display=t==='hist'?'block':'none';
+  if(t==='hist') loadHist();
+}
+
+function showAdmTab(t){
+  document.getElementById('admOv').style.display=t==='ov'?'block':'none';
+  document.getElementById('admUsers').style.display=t==='users'?'block':'none';
+  document.getElementById('admRpts').style.display=t==='rpts'?'block':'none';
+  ['aTO','aTU','aTR'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('active',['ov','users','rpts'][i]===t);
+  });
+  if(t==='users') loadAdmUsers();
+  if(t==='rpts') loadAdmRpts();
+}
+
+/* ================================================
+   AUTH (MOCK)
+   ================================================ */
+function doLogin(){
+  const email=document.getElementById('lEmail').value.trim();
+  const pass=document.getElementById('lPass').value;
+  if(!email||!pass){showMsg('lMsg','Please enter email and password.','err');return}
+  const u=USERS.find(x=>x.email===email&&x.password===pass);
+  if(!u){showMsg('lMsg','Invalid credentials. Try the demo accounts below.','err');return}
+  currentUser=u;
+  updateNav(u);
+  showToast('Welcome back, '+u.name+'!','success');
+  showPage(u.role==='admin'?'admin':'dashboard');
+}
+
+function doSignup(){
+  const name=document.getElementById('sName').value.trim();
+  const email=document.getElementById('sEmail').value.trim();
+  const pass=document.getElementById('sPass').value;
+  const comp=document.getElementById('sComp').value.trim();
+  if(!name||!email||!pass){showMsg('sMsg','Please fill all required fields.','err');return}
+  if(USERS.find(x=>x.email===email)){showMsg('sMsg','Email already exists. Try signing in.','err');return}
+  if(pass.length<6){showMsg('sMsg','Password must be at least 6 characters.','err');return}
+  const newU={id:USERS.length+1,name,email,password:pass,role:'user',company:comp||'',created_at:new Date().toISOString().split('T')[0]};
+  USERS.push(newU);
+  currentUser=newU;
+  updateNav(newU);
+  showToast('Account created! Welcome, '+name,'success');
+  showPage('dashboard');
+}
+
+function logout(){
+  currentUser=null;currentReport=null;
+  updateNav(null);
+  showToast('Signed out successfully.','info');
+  showPage('landing');
+}
+
+function updateNav(u){
+  const li=!!u,adm=u?.role==='admin';
+  document.getElementById('navIn').style.display=li?'none':'inline-flex';
+  document.getElementById('navOut').style.display=li?'inline':'none';
+  document.getElementById('navDash').style.display=li&&!adm?'inline':'none';
+  document.getElementById('navAnal').style.display=li&&!adm?'inline':'none';
+  document.getElementById('navAdm').style.display=adm?'inline':'none';
+}
+
+/* ================================================
+   DASHBOARD
+   ================================================ */
+function loadDash(){
+  if(!currentUser)return;
+  const n=currentUser.name;
+  const ini=n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sbAv').textContent=ini;
+  document.getElementById('sbName').textContent=n;
+  document.getElementById('sbRole').textContent=currentUser.company||'User';
+  document.getElementById('dashWel').textContent='Good to see you, '+n.split(' ')[0]+'!';
+
+  const rpts=REPORTS.filter(r=>r.user_id===currentUser.id);
+  document.getElementById('kTot').textContent=rpts.length;
+
+  if(rpts.length>0){
+    const lat=rpts[rpts.length-1];
+    document.getElementById('kScore').textContent=lat.score;
+    document.getElementById('kScore').className='kpi-v '+sColor(lat.score);
+    document.getElementById('kRisk').textContent=lat.risk_level;
+    document.getElementById('kRisk').className='kpi-v '+rColor(lat.risk_level);
+    document.getElementById('kDec').textContent=lat.decision;
+    document.getElementById('kDec').className='kpi-v '+dColor(lat.decision);
+    drawGauge('dashGauge',lat.score);
+    document.getElementById('gLbl').textContent='Score: '+lat.score+'/100';
+  }
+
+  const el=document.getElementById('recRpts');
+  if(rpts.length===0){el.innerHTML='<div class="empty">No analyses yet. <a onclick="showPage(\'analysis\')">Run your first →</a></div>';return}
+  el.innerHTML=[...rpts].reverse().slice(0,5).map(r=>`
+    <div class="ri" onclick="viewRpt(${r.id})">
+      <div><div style="font-weight:600">${fmtDate(r.created_at)}</div><div style="font-size:11px;color:var(--g400);margin-top:2px">${r.decision} · ${r.risk_level} Risk</div></div>
+      <div class="rs ${sColor(r.score)}">${r.score}</div>
+    </div>`).join('');
+}
+
+function loadHist(){
+  const rpts=REPORTS.filter(r=>r.user_id===currentUser.id);
+  const el=document.getElementById('histList');
+  if(rpts.length===0){el.innerHTML='<div class="empty">No reports found.</div>';return}
+  el.innerHTML=[...rpts].reverse().map(r=>`
+    <div class="hcard" onclick="viewRpt(${r.id})">
+      <div class="hct"><div class="hcs ${sColor(r.score)}">${r.score}</div><span class="badge b${r.risk_level.toLowerCase()[0]}">${r.risk_level} Risk</span></div>
+      <div class="hcr"><span class="hcl">Decision</span><span class="hcv ${dColor(r.decision)}">${r.decision}</span></div>
+      <div class="hcr"><span class="hcl">Date</span><span class="hcv">${fmtDate(r.created_at)}</span></div>
+      <div class="hcr"><span class="hcl">Admin Status</span><span class="hcv">${r.admin_decision||'Pending'}</span></div>
+    </div>`).join('');
+}
+
+function viewRpt(id){
+  const r=REPORTS.find(x=>x.id===id);
+  if(!r){showToast('Report not found.','error');return}
+  currentReport=r;
+  showPage('report');
+}
+
+/* ================================================
+   CREDIT ENGINE (MOCK)
+   ================================================ */
+function calcScore(revenue,expenses,gst,loan,yrs){
+  let score=50;const factors=[];const warnings=[];
+  const margin=((revenue-expenses)/revenue)*100;
+  if(margin>30){score+=20;factors.push({label:'Strong Profit Margin',impact:'+20',type:'positive'})}
+  else if(margin>15){score+=12;factors.push({label:'Healthy Profit Margin',impact:'+12',type:'positive'})}
+  else if(margin>5){score+=5;factors.push({label:'Moderate Profit Margin',impact:'+5',type:'neutral'})}
+  else if(margin>=0){score-=5;factors.push({label:'Thin Profit Margin',impact:'-5',type:'negative'})}
+  else{score-=20;factors.push({label:'Operating at Loss',impact:'-20',type:'negative'});warnings.push('Business is operating at a loss')}
+  if(revenue>=10000000){score+=10;factors.push({label:'High Revenue Volume',impact:'+10',type:'positive'})}
+  else if(revenue>=2500000){score+=6;factors.push({label:'Moderate Revenue',impact:'+6',type:'positive'})}
+  else if(revenue>=500000){score+=2;factors.push({label:'Early-Stage Revenue',impact:'+2',type:'neutral'})}
+  else{score-=5;factors.push({label:'Low Revenue Base',impact:'-5',type:'negative'})}
+  if(gst==='active'){score+=10;factors.push({label:'GST Compliant',impact:'+10',type:'positive'})}
+  else if(gst==='pending'){score+=2;factors.push({label:'GST Pending',impact:'+2',type:'neutral'})}
+  else{score-=8;factors.push({label:'GST Non-Compliant',impact:'-8',type:'negative'});warnings.push('GST non-compliance detected')}
+  if(loan==='no_default'){score+=15;factors.push({label:'Clean Credit History',impact:'+15',type:'positive'})}
+  else if(loan==='minor_default'){score-=10;factors.push({label:'Minor Past Default',impact:'-10',type:'negative'});warnings.push('Minor default on record')}
+  else if(loan==='major_default'){score-=25;factors.push({label:'Major Default History',impact:'-25',type:'negative'});warnings.push('Major default — critical risk')}
+  const b=parseInt(yrs)||1;
+  if(b>=5){score+=8;factors.push({label:'Established Business',impact:'+8',type:'positive'})}
+  else if(b>=2){score+=4;factors.push({label:'Growing Business',impact:'+4',type:'positive'})}
+  else{score-=3;factors.push({label:'New Business',impact:'-3',type:'neutral'})}
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  const risk=score>=70?'Low':score>=45?'Medium':'High';
+  const dec=score>=70?'Approved':score>=45?'Risky':'Rejected';
+  const ai_summary=`Credit Analysis Report — Score: ${score}/100 | Risk: ${risk} | Recommendation: ${dec}\n\nEXECUTIVE SUMMARY:\n${dec==='Approved'?'This entity presents a strong credit profile with adequate capacity to service debt obligations. Credit extension is recommended with standard monitoring protocols.':dec==='Risky'?'This entity presents a moderate credit profile requiring enhanced due diligence. Conditional approval may be considered with collateral requirements or guarantor provisions.':'This entity presents significant credit concerns. The current financial profile does not meet minimum lending criteria. Application is recommended for rejection pending material improvement in financial performance.'}\n\nKEY RISK FACTORS:\n${warnings.length?warnings.map(w=>'• '+w).join('\n'):'• No significant risk flags identified in automated screening.'}\n\nANALYSIS METHODOLOGY:\nThis score is computed using NextGen Credit Intelligence's rule-based scoring engine incorporating revenue-expense analysis, GST compliance, credit history, and business tenure evaluation.`;
+  return{score,risk_level:risk,decision:dec,ai_summary,factors,metrics:{profitMargin:margin.toFixed(2)}};
+}
+
+/* ================================================
+   ANALYSIS
+   ================================================ */
+function resetAnalysis(){
+  document.getElementById('aForm').style.display='flex';
+  document.getElementById('aResult').style.display='none';
+  document.getElementById('aBtn').disabled=false;
+  document.getElementById('aBtnTxt').style.display='inline';
+  document.getElementById('aBtnLdr').style.display='none';
+  document.getElementById('aMsg').textContent='';
+}
+
+function runAnalysis(){
+  const rev=parseFloat(document.getElementById('rev').value);
+  const exp=parseFloat(document.getElementById('exp').value);
+  const gst=document.getElementById('gst').value;
+  const loan=document.getElementById('loan').value;
+  const yrs=document.getElementById('yrs').value||1;
+  if(!rev||!exp||!gst||!loan){showMsg('aMsg','Please fill all required fields.','err');return}
+  if(isNaN(rev)||isNaN(exp)||rev<=0){showMsg('aMsg','Invalid revenue or expenses.','err');return}
+
+  document.getElementById('aBtn').disabled=true;
+  document.getElementById('aBtnTxt').style.display='none';
+  document.getElementById('aBtnLdr').style.display='inline-block';
+  showLoading('Analyzing financial data...');
+
+  setTimeout(()=>{
+    const r=calcScore(rev,exp,gst,loan,yrs);
+    hideLoading();
+    document.getElementById('aBtn').disabled=false;
+    document.getElementById('aBtnTxt').style.display='inline';
+    document.getElementById('aBtnLdr').style.display='none';
+
+    const rptId=nextReportId++;
+    const newRpt={
+      id:rptId,user_id:currentUser.id,
+      score:r.score,risk_level:r.risk_level,decision:r.decision,
+      admin_decision:'pending',revenue:rev,expenses:exp,
+      gst_status:gst,loan_history:loan,years_in_business:parseInt(yrs),
+      industry:document.getElementById('ind').value||'other',
+      created_at:new Date().toISOString().split('T')[0],
+      ai_summary:r.ai_summary,factors:r.factors,metrics:r.metrics
+    };
+    REPORTS.push(newRpt);
+    currentReport=newRpt;
+
+    document.getElementById('aForm').style.display='none';
+    document.getElementById('aResult').style.display='block';
+    document.getElementById('rScore').textContent=r.score;
+    document.getElementById('rScore').className='sb '+sColor(r.score);
+    document.getElementById('rRisk').textContent=r.risk_level+' Risk';
+    document.getElementById('rRisk').className='rbadge badge b'+r.risk_level.toLowerCase()[0];
+    document.getElementById('rDecT').textContent=r.decision;
+    document.getElementById('rDecI').textContent=r.decision==='Approved'?'✓':r.decision==='Risky'?'⚠':'✗';
+    document.getElementById('rDec').style.borderTop='3px solid '+(r.decision==='Approved'?'#34d399':r.decision==='Risky'?'#f59e0b':'#ef4444');
+    drawGauge('resGauge',r.score);
+    document.getElementById('fGrid').innerHTML=r.factors.map(f=>`<div class="fitem"><span class="fl">${f.label}</span><span class="fim ${f.type}">${f.impact}</span></div>`).join('');
+    document.getElementById('aiTxt').textContent=r.ai_summary;
+    showToast('Analysis complete!','success');
+  },2200);
+}
+
+/* ================================================
+   REPORT
+   ================================================ */
+function renderReport(r){
+  document.getElementById('rId').textContent='#'+(r.id||'—');
+  document.getElementById('rDate').textContent=fmtDate(r.created_at);
+  document.getElementById('rComp').textContent=currentUser?.company||currentUser?.name||'—';
+  document.getElementById('rAdmSt').textContent=r.admin_decision==='approved'?'✓ Approved':r.admin_decision==='rejected'?'✗ Rejected':'Pending Review';
+  document.getElementById('rsdS').textContent=r.score;
+  document.getElementById('rrRisk').textContent=r.risk_level||'—';
+  document.getElementById('rrDec').textContent=r.decision||'—';
+  document.getElementById('rrMar').textContent=r.metrics?.profitMargin?(parseFloat(r.metrics.profitMargin)).toFixed(1)+'%':r.revenue&&r.expenses?(((r.revenue-r.expenses)/r.revenue)*100).toFixed(1)+'%':'—';
+  document.getElementById('rrRev').textContent=r.revenue?'₹'+Number(r.revenue).toLocaleString('en-IN'):'—';
+  document.getElementById('rrExp').textContent=r.expenses?'₹'+Number(r.expenses).toLocaleString('en-IN'):'—';
+  document.getElementById('rrGst').textContent=r.gst_status?r.gst_status.charAt(0).toUpperCase()+r.gst_status.slice(1):'—';
+  document.getElementById('rrAi').textContent=r.ai_summary||'—';
+  const el=document.getElementById('rrFact');
+  if(r.factors&&r.factors.length){
+    el.innerHTML=r.factors.map(f=>`<div class="fr2"><span>${f.label}</span><span class="imp ${f.type==='positive'?'pos':f.type==='negative'?'neg':''}">${f.impact}</span></div>`).join('');
+  }else{el.innerHTML='<div style="font-size:12px;color:var(--g600)">Factor details not available.</div>'}
+}
+
+/* ================================================
+   ADMIN
+   ================================================ */
+function loadAdmin(){
+  if(!currentUser||currentUser.role!=='admin')return;
+  const users=USERS.filter(u=>u.role==='user');
+  const rpts=REPORTS;
+  document.getElementById('akU').textContent=users.length;
+  document.getElementById('akR').textContent=rpts.length;
+  document.getElementById('akA').textContent=rpts.filter(r=>r.decision==='Approved').length;
+  document.getElementById('akRj').textContent=rpts.filter(r=>r.decision==='Rejected').length;
+  document.getElementById('akAv').textContent=rpts.length?(rpts.reduce((a,r)=>a+r.score,0)/rpts.length).toFixed(1):'—';
+  document.getElementById('akP').textContent=rpts.filter(r=>r.admin_decision==='pending').length;
+  const pending=rpts.filter(r=>r.admin_decision==='pending');
+  const el=document.getElementById('admRec');
+  if(pending.length===0){el.innerHTML='<div class="empty">No reports pending review.</div>';return}
+  el.innerHTML=pending.map(r=>{
+    const u=USERS.find(x=>x.id===r.user_id);
+    return`<div class="ri"><div><div style="font-weight:600">${u?.company||u?.name||'—'}</div><div style="font-size:11px;color:var(--g400);margin-top:2px">Score: ${r.score} · ${r.risk_level} · ${fmtDate(r.created_at)}</div></div><button class="btnr" onclick="openModal(${r.id})">Review</button></div>`;
+  }).join('');
+}
+
+function loadAdmUsers(){
+  const users=USERS.filter(u=>u.role==='user');
+  document.getElementById('uCnt').textContent=users.length+' users';
+  document.getElementById('uTbody').innerHTML=users.map((u,i)=>`
+    <tr><td>${i+1}</td><td><strong>${u.name}</strong></td><td>${u.email}</td><td>${u.company||'—'}</td><td><span class="badge bl">${REPORTS.filter(r=>r.user_id===u.id).length} reports</span></td><td>${fmtDate(u.created_at)}</td></tr>
+  `).join('');
+}
+
+function loadAdmRpts(){
+  document.getElementById('rCnt').textContent=REPORTS.length+' reports';
+  document.getElementById('rTbody').innerHTML=REPORTS.map((r,i)=>{
+    const u=USERS.find(x=>x.id===r.user_id);
+    const admSt=r.admin_decision==='pending'?'<span class="badge bm">Pending</span>':r.admin_decision==='approved'?'<span class="badge bap">Approved</span>':'<span class="badge brj">Rejected</span>';
+    return`<tr>
+      <td>#${r.id}</td><td>${u?.company||u?.name||'—'}</td>
+      <td><strong>${r.score}</strong></td>
+      <td><span class="badge b${r.risk_level.toLowerCase()[0]}">${r.risk_level}</span></td>
+      <td><span class="badge b${r.decision.toLowerCase().startsWith('a')?'ap':r.decision.toLowerCase().startsWith('ri')?'ry':'rj'}">${r.decision}</span></td>
+      <td>${admSt}</td><td>${fmtDate(r.created_at)}</td>
+      <td>${r.admin_decision==='pending'?`<button class="btnr" onclick="openModal(${r.id})">Review</button>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openModal(id){
+  pendingId=id;
+  document.getElementById('mRId').textContent='#'+id;
+  document.getElementById('aNotes').value='';
+  document.getElementById('admModal').style.display='flex';
+}
+
+function closeModal(){document.getElementById('admModal').style.display='none';pendingId=null}
+
+function submitDec(dec){
+  if(!pendingId)return;
+  const r=REPORTS.find(x=>x.id===pendingId);
+  if(r){r.admin_decision=dec;r.admin_notes=document.getElementById('aNotes').value}
+  showToast('Report '+dec+' successfully.','success');
+  closeModal();
+  loadAdmin();
+  if(document.getElementById('admRpts').style.display!=='none')loadAdmRpts();
+}
+
+/* ================================================
+   CANVAS GAUGE
+   ================================================ */
+function drawGauge(id,score){
+  const c=document.getElementById(id);if(!c)return;
+  const ctx=c.getContext('2d');
+  const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const cx=w/2,cy=h*.88,r=Math.min(w,h*2)*.36;
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,0,false);
+  ctx.lineWidth=10;ctx.strokeStyle='rgba(255,255,255,.07)';ctx.stroke();
+  const col=score>=70?'#00897b':score>=45?'#f59e0b':'#dc2626';
+  const ang=Math.PI+(score/100)*Math.PI;
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,ang,false);
+  ctx.lineWidth=10;ctx.strokeStyle=col;ctx.lineCap='round';ctx.stroke();
+  ctx.fillStyle='#fff';
+  ctx.font=`bold ${Math.round(r*.44)}px DM Sans,sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(score,cx,cy-r*.1);
+}
+
+/* ================================================
+   HELPERS
+   ================================================ */
+function showMsg(id,msg,type){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='fm-msg '+type}
+function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.classList.remove('show'),3500)}
+function showLoading(txt){document.getElementById('ltxt').textContent=txt;document.getElementById('lov').style.display='flex'}
+function hideLoading(){document.getElementById('lov').style.display='none'}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+function sColor(s){return s>=70?'apc':s>=45?'ryc':'rjc'}
+function rColor(r){return r==='Low'?'apc':r==='Medium'?'ryc':'rjc'}
+function dColor(d){return d==='Approved'?'apc':d==='Risky'?'ryc':'rjc'}
+</script>
+</body>
+</html>
